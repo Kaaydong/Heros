@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Heros</string>
+    <string name="ranking">Ranking:</string>
+    <string name="superpower">Superpower:</string>
+    <string name="description">Description:</string>
+    <string name="todo">TODO</string>
+    <string name="go_back">Go Back</string>
 </resources>

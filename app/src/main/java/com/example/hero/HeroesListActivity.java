@@ -3,11 +3,13 @@ package com.example.hero;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -31,6 +33,8 @@ public class HeroesListActivity extends AppCompatActivity {
     private TextView test;
     private ListView listView;
 
+    public static final String EXTRA_LIST = "list";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +50,8 @@ public class HeroesListActivity extends AppCompatActivity {
         HeroAdapter heroAdapter = new HeroAdapter(heroList);
 
         listView.setAdapter(heroAdapter);
+
+        setListeners();
     }
 
     public String readTextFile(InputStream inputStream) {
@@ -80,10 +86,24 @@ public class HeroesListActivity extends AppCompatActivity {
         listView = findViewById(R.id.listView_main_listview);
     }
 
+    public void setListeners()
+    {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                Intent targetIntent = new Intent(HeroesListActivity.this, HeroDetailActivity.class);
+
+                targetIntent.putExtra(EXTRA_LIST, heroList.get(position));
+
+                startActivity(targetIntent);
+                finish();
+            }
+        });
+    }
 
 
-
-    private class HeroAdapter extends ArrayAdapter<Heros> {
+        private class HeroAdapter extends ArrayAdapter<Heros> {
         // make an instance variable to keep track of the hero list
         private List<Heros> heroesList;
 
@@ -121,6 +141,9 @@ public class HeroesListActivity extends AppCompatActivity {
             TextView textViewNumber = convertView.findViewById(R.id.textView_heroItem_number);
             // do this for as many widgets as you need
 
+            textViewName.setText(heroesList.get(position).getName());
+            textViewDesctiption.setText(heroesList.get(position).getDescription());
+            textViewNumber.setText(heroesList.get(position).getRanking()+"");
             // set the values for each widget. use the position parameter variable
             // to get the hero that you need out of the list
             // and set the values for widgets.
