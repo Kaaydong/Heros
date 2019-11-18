@@ -7,12 +7,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.heros.R;
 import com.google.gson.Gson;
@@ -23,6 +27,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class HeroesListActivity extends AppCompatActivity {
@@ -32,6 +38,7 @@ public class HeroesListActivity extends AppCompatActivity {
     private List<Heros> heroList;
     private TextView test;
     private ListView listView;
+    private HeroAdapter heroAdapter;
 
     public static final String EXTRA_LIST = "list";
 
@@ -47,11 +54,61 @@ public class HeroesListActivity extends AppCompatActivity {
 
         createGson();
 
-        HeroAdapter heroAdapter = new HeroAdapter(heroList);
+        heroAdapter = new HeroAdapter(heroList);
 
         listView.setAdapter(heroAdapter);
 
         setListeners();
+    }
+
+    // Options Menu
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_heroeslist_sort_by_rank:
+                sortByRank();
+                return true;
+            case R.id.action_heroeslist_sort_by_name:
+                sortByName();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void sortByName() {
+        Collections.sort(heroAdapter.heroesList, new Comparator<Heros>() {
+            @Override
+            public int compare(Heros heros, Heros t1) {
+
+                return heros.getName().toLowerCase().compareTo(t1.getName().toLowerCase());
+            }
+        });
+        heroAdapter.notifyDataSetChanged();
+    }
+    // the data in the adapter has changed, but it isn't aware
+    // call the method notifyDataSetChanged on the adapter
+    private void sortByRank() {
+        // Collections.sort(heroadapter.heroeslist)
+        Collections.sort(heroAdapter.heroesList, new Comparator<Heros>() {
+            @Override
+            public int compare(Heros heros, Heros t1) {
+                // negative number if heros comes before t1
+                // 0 if thing and t1 are the same
+                // positive number if thing comes after
+                return heros.getRanking() - t1.getRanking();
+            }
+        });
+        heroAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_heroeslist_sorting, menu);
+        return true;
     }
 
     public String readTextFile(InputStream inputStream) {
